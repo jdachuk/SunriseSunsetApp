@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">SunriseSunsetApplication</string>
+    <string name="current_place_desc">Current location.</string>
+    <string name="title_activity_maps">Map</string>
+</resources>

@@ -41,4 +41,24 @@ class Results {
                 "Astronomical twilight begin at : " + this.astronomical_twilight_begin + "\n" +
                 "Astronomical twilight ends at : " + this.astronomical_twilight_end;
     }
+
+    public String getSunrise() {
+        return sunrise;
+    }
+
+    public String getSunset() {
+        return sunset;
+    }
+
+    public String getDay_length() {
+        return day_length;
+    }
+
+    public String getCivil_twilight_begin() {
+        return civil_twilight_begin;
+    }
+
+    public String getCivil_twilight_end() {
+        return civil_twilight_end;
+    }
 }

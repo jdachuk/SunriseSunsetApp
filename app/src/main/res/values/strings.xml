@@ -2,4 +2,14 @@
     <string name="app_name">SunriseSunsetApplication</string>
     <string name="current_place_desc">Current location.</string>
     <string name="title_activity_maps">Map</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="expand_info">Expand info</string>
+    <string name="day_length">Day length :</string>
+    <string name="sunrise">Sunrise :</string>
+    <string name="sunset">Sunset :</string>
+    <string name="twilight">Twilight</string>
+    <string name="start">Start</string>
+    <string name="end">End</string>
 </resources>

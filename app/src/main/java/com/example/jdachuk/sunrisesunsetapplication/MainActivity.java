@@ -1,6 +1,7 @@
 package com.example.jdachuk.sunrisesunsetapplication;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -8,9 +9,10 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.View;
-import android.widget.TextView;
+import android.widget.ImageView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -47,20 +49,47 @@ public class MainActivity extends FragmentActivity
     private GoogleApiClient mGoogleApiClient;
     private PendingResult<PlaceLikelihoodBuffer> mResult;
     private PlaceAutocompleteFragment autocompleteFragment;
+    private InfoFragment mInfoFragment;
 
-    public TextView mInfo;
+    private CardView mInfoContainer;
+    private ImageView mCollapseBtn;
+
     private GoogleMap mMap;
+    private Place mSelectedPlace;
 
-    public static Results results;
+    private int mInfoContainerState = STATE_COLLAPSED;
 
     private final static String TAG = "Tag";
     private final static int PERMISSION_REQUEST = 1023;
+    private final static int STATE_EXPANDED = 1;
+    private final static int STATE_COLLAPSED = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mInfo = findViewById(R.id.info);
+        mInfoFragment = (InfoFragment) getSupportFragmentManager().findFragmentById(R.id.info_container);
+        mInfoContainer = findViewById(R.id.container);
+
+        mCollapseBtn = findViewById(R.id.expand_collapse_btn);
+
+        mCollapseBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                switch (mInfoContainerState) {
+                    case STATE_COLLAPSED:
+                        mInfoContainer.setVisibility(View.VISIBLE);
+                        mCollapseBtn.setImageResource(R.drawable.ic_expand_less_black_24dp);
+                        mInfoContainerState = STATE_EXPANDED;
+                        break;
+                    case STATE_EXPANDED:
+                        mInfoContainer.setVisibility(View.GONE);
+                        mCollapseBtn.setImageResource(R.drawable.ic_expand_more_black_24dp);
+                        mInfoContainerState = STATE_COLLAPSED;
+                        break;
+                }
+            }
+        });
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -87,12 +116,15 @@ public class MainActivity extends FragmentActivity
                 mResult.setResultCallback(new ResultCallback<PlaceLikelihoodBuffer>() {
                     @Override
                     public void onResult(@NonNull PlaceLikelihoodBuffer likelyPlaces) {
+                        PlaceLikelihood place_Likelihood = likelyPlaces.get(0);
+                        mSelectedPlace = place_Likelihood.getPlace();
                         for (PlaceLikelihood placeLikelihood : likelyPlaces) {
-                            Log.d(TAG, placeLikelihood.getPlace().getLatLng().toString());
-
-                            autocompleteFragment.setText(null);
-                            getSunriseSunset(placeLikelihood.getPlace().getLatLng());
+                            if(placeLikelihood.getLikelihood() < place_Likelihood.getLikelihood()) {
+                                mSelectedPlace = placeLikelihood.getPlace();
+                            }
                         }
+                        autocompleteFragment.setText(mSelectedPlace.getName());
+                        getSunriseSunset(mSelectedPlace.getLatLng());
                         likelyPlaces.release();
                     }
                 });
@@ -103,13 +135,14 @@ public class MainActivity extends FragmentActivity
         autocompleteFragment = (PlaceAutocompleteFragment)
                 getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
 
-        autocompleteFragment.setHint("Find place.");
+        autocompleteFragment.setHint("Search");
 
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
 
             @Override
             public void onPlaceSelected(Place place) {
-                getSunriseSunset(place.getLatLng());
+                mSelectedPlace = place;
+                getSunriseSunset(mSelectedPlace.getLatLng());
             }
 
             @Override
@@ -135,19 +168,27 @@ public class MainActivity extends FragmentActivity
         mResult.setResultCallback(new ResultCallback<PlaceLikelihoodBuffer>() {
             @Override
             public void onResult(@NonNull PlaceLikelihoodBuffer likelyPlaces) {
+                PlaceLikelihood place_Likelihood = likelyPlaces.get(0);
+                mSelectedPlace = place_Likelihood.getPlace();
                 for (PlaceLikelihood placeLikelihood : likelyPlaces) {
-                    Log.d(TAG, placeLikelihood.getPlace().getLatLng().toString());
-
-                    getSunriseSunset(placeLikelihood.getPlace().getLatLng());
+                    if(placeLikelihood.getLikelihood() < place_Likelihood.getLikelihood()) {
+                        mSelectedPlace = placeLikelihood.getPlace();
+                    }
                 }
+                autocompleteFragment.setText(mSelectedPlace.getName());
+                getSunriseSunset(mSelectedPlace.getLatLng());
                 likelyPlaces.release();
             }
         });
     }
 
+    public void setUpInfo(Results info) {
+        mInfoFragment.setUpInfo(info);
+    }
+
     private void getSunriseSunset(LatLng latLng) {
         mMap.clear();
-        mMap.addMarker(new MarkerOptions().position(latLng).title("Marker"));
+        mMap.addMarker(new MarkerOptions().position(latLng).title(mSelectedPlace.getName().toString()));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
         try {
             URL jsonUrl = new URL("https://api.sunrise-sunset.org/json?lat=" + latLng.latitude
@@ -185,7 +226,6 @@ public class MainActivity extends FragmentActivity
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        // Add a marker in Sydney and move the camera
         LatLng sydney = new LatLng(-34, 151);
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
@@ -195,7 +235,8 @@ public class MainActivity extends FragmentActivity
 
         private StringBuilder data = new StringBuilder();
 
-        MainActivity mParentActivity;
+        @SuppressLint("StaticFieldLeak")
+        private MainActivity mParentActivity;
 
         MyAsync(MainActivity activity) {
             mParentActivity = activity;
@@ -234,8 +275,8 @@ public class MainActivity extends FragmentActivity
             super.onPostExecute(jsonObject);
 
             try {
-                results = new Results(jsonObject.getJSONObject("results"));
-                mParentActivity.mInfo.setText(results.getInfo());
+                Results results = new Results(jsonObject.getJSONObject("results"));
+                mParentActivity.setUpInfo(results);
             } catch (JSONException e) {
                 e.printStackTrace();
             }

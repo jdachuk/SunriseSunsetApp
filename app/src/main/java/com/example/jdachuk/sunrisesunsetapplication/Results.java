@@ -31,17 +31,6 @@ class Results {
         }
     }
 
-    public String getInfo() {
-        return "Sunset at : " + this.sunset + "\n" +
-                "Sunrise at : " + this.sunrise + "\n" +
-                "Solar noon  at : " + this.solar_noon + "\n" +
-                "Day length : " + this.day_length + "\n" +
-                "Civil twilight begin at : " + this.civil_twilight_begin + "\n" +
-                "Civil twilight ends at : " + this.civil_twilight_end + "\n" +
-                "Astronomical twilight begin at : " + this.astronomical_twilight_begin + "\n" +
-                "Astronomical twilight ends at : " + this.astronomical_twilight_end;
-    }
-
     public String getSunrise() {
         return sunrise;
     }

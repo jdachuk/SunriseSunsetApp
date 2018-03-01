@@ -3,19 +3,29 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="#ffffff"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.jdachuk.sunrisesunsetapplication.MainActivity">
 
-    <fragment
-        android:id="@+id/place_autocomplete_fragment"
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/appbar"
         android:layout_width="0dp"
-        android:layout_height="50dp"
-        android:name="com.google.android.gms.location.places.ui.PlaceAutocompleteFragment"
+        android:layout_height="?actionBarSize"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent">
+
+
+        <fragment
+            android:id="@+id/place_autocomplete_fragment"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:name="com.google.android.gms.location.places.ui.PlaceAutocompleteFragment"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </android.support.design.widget.AppBarLayout>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fix_gps"
@@ -35,7 +45,7 @@
         android:layout_height="0dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/place_autocomplete_fragment"
+        app:layout_constraintTop_toBottomOf="@id/appbar"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
     <android.support.v7.widget.CardView
@@ -46,7 +56,7 @@
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
         android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@id/place_autocomplete_fragment"
+        app:layout_constraintTop_toBottomOf="@id/appbar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 

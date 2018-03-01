@@ -1,11 +1,12 @@
-package com.example.jdachuk.sunrisesunsetapplication;
+package com.example.jdachuk.sunrisesunsetapplication.models;
 
 import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-class Results {
+public class Results {
+
     private String sunrise;
     private String sunset;
     private String solar_noon;
@@ -15,7 +16,7 @@ class Results {
     private String astronomical_twilight_begin;
     private String astronomical_twilight_end;
 
-    Results(JSONObject jsonObject) {
+    public Results(JSONObject jsonObject) {
         Log.d("Test", jsonObject.toString());
         try {
             this.astronomical_twilight_begin = jsonObject.getString("astronomical_twilight_begin");

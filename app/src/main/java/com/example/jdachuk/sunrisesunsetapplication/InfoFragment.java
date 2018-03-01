@@ -9,6 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.example.jdachuk.sunrisesunsetapplication.models.Results;
+
 public class InfoFragment extends Fragment {
 
     private TextView mDayLength, mSunrise, mSunset, mTwilightStart, mTwilightEnd;

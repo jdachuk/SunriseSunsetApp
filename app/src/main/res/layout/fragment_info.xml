@@ -6,64 +6,93 @@
     android:background="#70ffffff"
     tools:context="com.example.jdachuk.sunrisesunsetapplication.InfoFragment">
 
-    <TextView
-        android:id="@+id/day_length"
-        android:layout_width="wrap_content"
-        android:layout_height="30dp"
-        android:text="@string/day_length"
-        android:textSize="22sp"
-        android:textStyle="bold"
-        android:layout_marginStart="15dp"
-        android:layout_marginTop="10dp"
+    <TableLayout
+        android:id="@+id/table"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent">
 
-    <TextView
-        android:id="@+id/day_length_info"
-        android:layout_width="wrap_content"
-        android:layout_height="30dp"
-        android:textSize="20sp"
-        android:layout_marginStart="20dp"
-        app:layout_constraintStart_toEndOf="@id/day_length"
-        app:layout_constraintTop_toTopOf="@id/day_length" />
+        <TableRow
+            android:layout_marginEnd="20dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
 
-    <TextView
-        android:id="@+id/sunrise"
-        android:layout_width="wrap_content"
-        android:layout_height="30dp"
-        android:text="@string/sunrise"
-        android:textSize="22sp"
-        android:textStyle="bold"
-        android:layout_marginTop="10dp"
-        app:layout_constraintStart_toStartOf="@id/day_length"
-        app:layout_constraintTop_toBottomOf="@id/day_length" />
+            <TextView
+                android:id="@+id/day_length"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:text="@string/day_length"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:layout_column="0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/sunrise_info"
-        android:layout_width="wrap_content"
-        android:layout_height="30dp"
-        android:textSize="20sp"
-        app:layout_constraintStart_toStartOf="@id/day_length_info"
-        app:layout_constraintTop_toTopOf="@id/sunrise" />
+            <TextView
+                android:id="@+id/day_length_info"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_marginStart="20dp"
+                android:textSize="20sp"
+                android:layout_column="1"
+                app:layout_constraintStart_toEndOf="@id/day_length"
+                app:layout_constraintTop_toTopOf="@id/day_length" />
+        </TableRow>
+        <TableRow
+            android:layout_marginEnd="20dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="20dp">
 
-    <TextView
-        android:id="@+id/sunset"
-        android:layout_width="wrap_content"
-        android:layout_height="30dp"
-        android:text="@string/sunset"
-        android:textSize="22sp"
-        android:textStyle="bold"
-        android:layout_marginTop="10dp"
-        app:layout_constraintStart_toStartOf="@id/day_length"
-        app:layout_constraintTop_toBottomOf="@id/sunrise" />
+            <TextView
+                android:id="@+id/sunrise"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:text="@string/sunrise"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:layout_column="0"
+                app:layout_constraintStart_toStartOf="@id/day_length"
+                app:layout_constraintTop_toBottomOf="@id/day_length" />
 
-    <TextView
-        android:id="@+id/sunset_info"
-        android:layout_width="wrap_content"
-        android:layout_height="30dp"
-        android:textSize="20sp"
-        app:layout_constraintStart_toStartOf="@id/day_length_info"
-        app:layout_constraintTop_toTopOf="@id/sunset" />
+            <TextView
+                android:id="@+id/sunrise_info"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:textSize="20sp"
+                android:layout_column="1"
+                app:layout_constraintStart_toStartOf="@id/day_length_info"
+                app:layout_constraintTop_toTopOf="@id/sunrise" />
+        </TableRow>
+
+        <TableRow
+            android:layout_marginEnd="20dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="20dp">
+            <TextView
+                android:id="@+id/sunset"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:text="@string/sunset"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:layout_column="0"
+                app:layout_constraintStart_toStartOf="@id/day_length"
+                app:layout_constraintTop_toBottomOf="@id/sunrise" />
+
+            <TextView
+                android:id="@+id/sunset_info"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:textSize="20sp"
+                android:layout_column="1"
+                app:layout_constraintStart_toStartOf="@id/day_length_info"
+                app:layout_constraintTop_toTopOf="@id/sunset" />
+
+        </TableRow>
+    </TableLayout>
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/twilight_info"
@@ -75,7 +104,7 @@
         android:layout_marginEnd="20dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/sunset">
+        app:layout_constraintTop_toBottomOf="@id/table">
 
         <TextView
             android:id="@+id/twilight"
@@ -136,7 +165,5 @@
             app:layout_constraintEnd_toEndOf="parent"/>
 
     </android.support.constraint.ConstraintLayout>
-
-
 
 </android.support.constraint.ConstraintLayout>

@@ -1,9 +1,7 @@
 package com.example.jdachuk.sunrisesunsetapplication;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -14,6 +12,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.example.jdachuk.sunrisesunsetapplication.async.SunriseSunsetAsync;
+import com.example.jdachuk.sunrisesunsetapplication.callbacks.DownloadCallback;
 import com.example.jdachuk.sunrisesunsetapplication.models.Results;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -36,16 +36,12 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class MainActivity extends FragmentActivity
     implements GoogleApiClient.OnConnectionFailedListener,
-        OnMapReadyCallback {
+        OnMapReadyCallback, DownloadCallback {
 
     private GoogleApiClient mGoogleApiClient;
     private PendingResult<PlaceLikelihoodBuffer> mResult;
@@ -195,8 +191,10 @@ public class MainActivity extends FragmentActivity
             URL jsonUrl = new URL("https://api.sunrise-sunset.org/json?lat=" + latLng.latitude
                     + "&lng=" + latLng.longitude);
 
-            MyAsync async = new MyAsync(this);
-            async.execute(jsonUrl);
+            new SunriseSunsetAsync()
+                    .setCallbackListener(this)
+                    .execute(jsonUrl);
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -228,59 +226,17 @@ public class MainActivity extends FragmentActivity
         mMap = googleMap;
 
         LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+        mMap.addMarker(new MarkerOptions().position(sydney).title("Sydney"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
     }
 
-    static class MyAsync extends AsyncTask<URL, Void, JSONObject> {
-
-        private StringBuilder data = new StringBuilder();
-
-        @SuppressLint("StaticFieldLeak")
-        private MainActivity mParentActivity;
-
-        MyAsync(MainActivity activity) {
-            mParentActivity = activity;
-        }
-
-        @Override
-        protected JSONObject doInBackground(URL... strings) {
-
-            JSONObject jsonObject = null;
-
-            try {
-                URL url = strings[0];
-
-                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-                httpURLConnection.connect();
-                InputStream inputStream = httpURLConnection.getInputStream();
-                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-
-                String line;
-
-                while ((line = bufferedReader.readLine()) != null) {
-                    data.append(line);
-                }
-
-                jsonObject = new JSONObject(data.toString());
-
-            } catch (IOException | JSONException e) {
-                e.printStackTrace();
-            }
-
-            return jsonObject;
-        }
-
-        @Override
-        protected void onPostExecute(JSONObject jsonObject) {
-            super.onPostExecute(jsonObject);
-
-            try {
-                Results results = new Results(jsonObject.getJSONObject("results"));
-                mParentActivity.setUpInfo(results);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+    @Override
+    public void onTaskCompleted(JSONObject object) {
+        try {
+            Results results = new Results(object.getJSONObject("results"));
+            setUpInfo(results);
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
     }
 }

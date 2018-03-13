@@ -56,7 +56,9 @@ public class SunriseSunsetAsync extends AsyncTask<URL, Void, JSONObject> {
     protected void onPostExecute(JSONObject jsonObject) {
         super.onPostExecute(jsonObject);
 
-        callback.onTaskCompleted(jsonObject);
+        if (jsonObject != null && callback != null) {
+            callback.onTaskCompleted(jsonObject);
+        }
     }
 
 }

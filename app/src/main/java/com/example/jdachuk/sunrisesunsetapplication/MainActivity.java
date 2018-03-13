@@ -11,10 +11,8 @@ import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
 
-import com.example.jdachuk.sunrisesunsetapplication.async.SunriseSunsetAsync;
-import com.example.jdachuk.sunrisesunsetapplication.callbacks.DownloadCallback;
-import com.example.jdachuk.sunrisesunsetapplication.models.Results;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
@@ -33,15 +31,11 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.IOException;
-import java.net.URL;
 
 public class MainActivity extends FragmentActivity
     implements GoogleApiClient.OnConnectionFailedListener,
-        OnMapReadyCallback, DownloadCallback {
+        OnMapReadyCallback {
 
     private GoogleApiClient mGoogleApiClient;
     private PendingResult<PlaceLikelihoodBuffer> mResult;
@@ -70,23 +64,25 @@ public class MainActivity extends FragmentActivity
 
         mCollapseBtn = findViewById(R.id.expand_collapse_btn);
 
-        mCollapseBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                switch (mInfoContainerState) {
-                    case STATE_COLLAPSED:
-                        mInfoContainer.setVisibility(View.VISIBLE);
-                        mCollapseBtn.setImageResource(R.drawable.ic_expand_less_black_24dp);
-                        mInfoContainerState = STATE_EXPANDED;
-                        break;
-                    case STATE_EXPANDED:
-                        mInfoContainer.setVisibility(View.GONE);
-                        mCollapseBtn.setImageResource(R.drawable.ic_expand_more_black_24dp);
-                        mInfoContainerState = STATE_COLLAPSED;
-                        break;
+        if(mCollapseBtn != null) {
+            mCollapseBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    switch (mInfoContainerState) {
+                        case STATE_COLLAPSED:
+                            mInfoContainer.setVisibility(View.VISIBLE);
+                            mCollapseBtn.setImageResource(R.drawable.ic_expand_less_black_24dp);
+                            mInfoContainerState = STATE_EXPANDED;
+                            break;
+                        case STATE_EXPANDED:
+                            mInfoContainer.setVisibility(View.GONE);
+                            mCollapseBtn.setImageResource(R.drawable.ic_expand_more_black_24dp);
+                            mInfoContainerState = STATE_COLLAPSED;
+                            break;
+                    }
                 }
-            }
-        });
+            });
+        }
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -187,18 +183,20 @@ public class MainActivity extends FragmentActivity
         mMap.clear();
         mMap.addMarker(new MarkerOptions().position(latLng).title(mSelectedPlace.getName().toString()));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        try {
-            URL jsonUrl = new URL("https://api.sunrise-sunset.org/json?lat=" + latLng.latitude
-                    + "&lng=" + latLng.longitude);
 
-            new SunriseSunsetAsync()
-                    .setCallbackListener(this)
-                    .execute(jsonUrl);
+        SunriseSunset.start().setLatLng(latLng)
+                .load().withCallback(new DownloadCallback() {
+            @Override
+            public void onTaskSuccessful(JSONObject object) {
+                Results results = new Results(object);
+                setUpInfo(results);
+            }
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+            @Override
+            public void onTaskFailed(Exception e) {
+                ShowErrorMessage(e);
+            }
+        });
     }
 
     @Override
@@ -218,7 +216,7 @@ public class MainActivity extends FragmentActivity
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
+        ShowMessage(connectionResult.getErrorMessage());
     }
 
     @Override
@@ -230,13 +228,13 @@ public class MainActivity extends FragmentActivity
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
     }
 
-    @Override
-    public void onTaskCompleted(JSONObject object) {
-        try {
-            Results results = new Results(object.getJSONObject("results"));
-            setUpInfo(results);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+    private void ShowErrorMessage(Exception e) {
+        if(e != null)
+            Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+    }
+
+    private void ShowMessage(String message) {
+        if(message != null)
+            Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
 }

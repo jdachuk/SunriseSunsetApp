@@ -1,4 +1,4 @@
-package com.example.jdachuk.sunrisesunsetapplication.models;
+package com.example.jdachuk.sunrisesunsetapplication;
 
 import android.util.Log;
 

@@ -1,8 +1,6 @@
-package com.example.jdachuk.sunrisesunsetapplication.async;
+package com.example.jdachuk.sunrisesunsetapplication;
 
 import android.os.AsyncTask;
-
-import com.example.jdachuk.sunrisesunsetapplication.callbacks.DownloadCallback;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -18,6 +16,11 @@ public class SunriseSunsetAsync extends AsyncTask<URL, Void, JSONObject> {
 
     private StringBuilder data = new StringBuilder();
     private DownloadCallback callback;
+    private URL url;
+
+    public SunriseSunsetAsync(URL url) {
+        this.url = url;
+    }
 
     @Override
     protected JSONObject doInBackground(URL... strings) {
@@ -47,9 +50,9 @@ public class SunriseSunsetAsync extends AsyncTask<URL, Void, JSONObject> {
         return jsonObject;
     }
 
-    public SunriseSunsetAsync setCallbackListener(DownloadCallback callback) {
+    public void withCallback(DownloadCallback callback) {
         this.callback = callback;
-        return this;
+        this.execute(url);
     }
 
     @Override
@@ -57,7 +60,11 @@ public class SunriseSunsetAsync extends AsyncTask<URL, Void, JSONObject> {
         super.onPostExecute(jsonObject);
 
         if (jsonObject != null && callback != null) {
-            callback.onTaskCompleted(jsonObject);
+            try {
+                callback.onTaskSuccessful(jsonObject.getJSONObject("results"));
+            } catch (JSONException e) {
+                callback.onTaskFailed(e);
+            }
         }
     }
 
